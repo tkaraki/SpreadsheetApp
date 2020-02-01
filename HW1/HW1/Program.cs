@@ -10,6 +10,24 @@ namespace HW1
     {
         static void Main(string[] args)
         {
+            int Exited = 0;
+
+            while (Exited != 1)
+            {
+
+
+                Program p = new Program();
+                p.PrintMenu();
+                Exited = p.ReadMenu();
+            }
+
+
+            Console.WriteLine("\n\n\nPress any key to close");
+            Console.ReadKey();
         }
+
+        void PrintMenu() { }
+
+        int ReadMenu() { }
     }
 }
