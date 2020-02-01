@@ -76,11 +76,12 @@ namespace HW1
         }
 
 
-
+        /* Return if BST is empty */
         public bool isEmpty()
         {
             return BSTroot == null;
         }
+
 
         /* Helper Functions */
 
