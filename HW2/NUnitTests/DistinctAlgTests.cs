@@ -76,5 +76,60 @@ namespace NUnit.ListMethods
 
             Assert.That(answer, Is.EqualTo(isEmpty));
         }
+
+
+        //Test HashSetAlg funcition
+        [Test]
+        public void TestHashSetAlg()
+        {
+            // Test edge case
+            List<int> emptyList = new List<int>();
+            int empList = WindowsFormsApp.DistinctAlgorithms.HashSetAlg(emptyList);
+            var empAnswer = 0;
+            Assert.That(empAnswer, Is.EqualTo(empList));
+
+            //Test normal case
+            List<int> regularList = new List<int>() { 1,1,1,2};
+            int regList = WindowsFormsApp.DistinctAlgorithms.HashSetAlg(regularList);
+            var regAnswer = 2;
+            Assert.That(regAnswer, Is.EqualTo(regList));
+        }
+
+
+        //Test O1SpaceAlg funcition
+        [Test]
+        public void TestO1SpaceAlg()
+        {
+            // Test edge case
+            List<int> emptyList = new List<int>();
+            int empList = WindowsFormsApp.DistinctAlgorithms.O1SpaceAlg(emptyList);
+            var empAnswer = 0;
+            Assert.That(empAnswer, Is.EqualTo(empList));
+
+            //Test normal case
+            List<int> regularList = new List<int>() { 1, 1, 1, 2 };
+            int regList = WindowsFormsApp.DistinctAlgorithms.O1SpaceAlg(regularList);
+            var regAnswer = 2;
+            Assert.That(regAnswer, Is.EqualTo(regList));
+        }
+
+
+        //Test SortListAlg funcition
+        [Test]
+        public void TestSortListAlg()
+        {
+            // Test edge case
+            List<int> emptyList = new List<int>();
+            int empList = WindowsFormsApp.DistinctAlgorithms.SortListAlg(emptyList);
+            var empAnswer = 0;
+            Assert.That(empAnswer, Is.EqualTo(empList));
+
+            //Test normal case
+            List<int> regularList = new List<int>() { 1, 1, 1, 2 };
+            int regList = WindowsFormsApp.DistinctAlgorithms.SortListAlg(regularList);
+            var regAnswer = 2;
+            Assert.That(regAnswer, Is.EqualTo(regList));
+        }
+
     }
 }
