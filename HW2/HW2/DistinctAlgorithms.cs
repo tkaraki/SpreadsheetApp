@@ -26,7 +26,12 @@ namespace WindowsFormsApp
          */
         public static void InitializeList(ref List<int> myList)
         {
-            
+            Random rand = new Random();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                myList.Add(rand.Next(20000));
+            }
         }
 
 
@@ -44,7 +49,9 @@ namespace WindowsFormsApp
         */
         public static int HashSetAlg(List<int> myList)
         {
-           
+            HashSet<int> hSet = new HashSet<int>(myList);
+
+            return hSet.Count;
         }
 
 
@@ -59,7 +66,30 @@ namespace WindowsFormsApp
         */
         public static int O1SpaceAlg(List<int> myList)
         {
-            
+
+            int distinctNb = 0;   //Distinct Number Count, O(1) space
+            bool isDistinct;
+
+            for (int i = 0; i < myList.Count; i++)
+            {
+                isDistinct = true;       //reset flag to true
+
+                for (int j = i + 1; j < myList.Count; j++) //Starts loop after the location of i for less runtime
+                {
+                    if (myList[i] == myList[j])
+                    {
+                        isDistinct = false;
+                        break;  //break after first flag for less runtime
+                    }
+
+                }
+
+                if (isDistinct == true)
+                    distinctNb++;
+            }
+
+
+            return distinctNb;
         }
 
 
@@ -74,6 +104,20 @@ namespace WindowsFormsApp
          */
         public static int SortListAlg(List<int> myList)
         {
+            myList.Sort();
+
+            // var is O(1) space
+            int distinctNb = myList.Count;
+
+            // loop requires O(n) time
+            for (int i = 0; i < myList.Count - 1; i++)
+            {
+                if (myList[i] == myList[i + 1])
+                    distinctNb--;
+            }
+
+
+            return distinctNb;
         }
 
 
@@ -86,7 +130,33 @@ namespace WindowsFormsApp
          */
         public static string ProgramResults()
         {
-            
+            NumList.NumberList.Clear(); //clear the list for it to be initialized at 10000 elements again
+
+            InitializeList(ref NumList.NumberList);
+            var hset = HashSetAlg(NumList.NumberList);
+            var O1comp = O1SpaceAlg(NumList.NumberList);
+            var sorted = SortListAlg(NumList.NumberList);
+
+
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("HashSet Method: {0}\n", hset);
+            sb.AppendLine();
+            sb.Append("This method creates a hash set by copying all the elements of the List." +
+                "Since the Hash Set structure does not allow duplicates," +
+                "there are no extra steps taken to remove them," +
+                "other than adding the list in the constructor for it to be copied at creation." +
+                "In this way, the only function is creating the hash set, which is O(N):\n" +
+                "Add function is O(1), and is being implemented for the whole List, i.e O(N).\n" +
+                "The distinct count is simply finding the capacity of the set, O(1)," +
+                "through the MSDN function HashSet.Count \n\n");
+            sb.AppendLine();
+            sb.AppendFormat("O(1) Storage Method: {0}\n\n", O1comp);
+            sb.AppendLine();
+            sb.AppendFormat("Sorted Method: {0}\n\n", sorted);
+
+
+            return sb.ToString();
         }
 
 
