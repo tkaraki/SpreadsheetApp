@@ -23,8 +23,6 @@ namespace HW3
 
         }
 
-
-
         /// <summary>
         /// LoadText Function that uses System.IO.TextReader to take a TextReader
         /// object and puts it in the text box of interface.

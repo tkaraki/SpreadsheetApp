@@ -20,5 +20,21 @@ namespace FibonacciTests
 
         }
 
+        [Test]
+        public void TestFibonacciSequenceZero()
+        {
+            string answer2 = "1: 0";
+            HW3.FibonacciTextReader fibonacci = new HW3.FibonacciTextReader(1);
+            Assert.AreEqual(answer2, fibonacci.ReadToEnd());
+        }
+
+        [Test]
+        public void TestFibonacciSequenceNegative()
+        {
+            string answer3 = string.Empty;
+            HW3.FibonacciTextReader fibonacci = new HW3.FibonacciTextReader(-1);
+            Assert.AreEqual(answer3, fibonacci.ReadToEnd());
+        }
+
     }
 }

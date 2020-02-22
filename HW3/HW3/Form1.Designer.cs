@@ -44,6 +44,7 @@
             this.textBox1.Location = new System.Drawing.Point(5, 30);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
+            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.textBox1.Size = new System.Drawing.Size(793, 418);
             this.textBox1.TabIndex = 0;
             this.textBox1.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
@@ -72,14 +73,14 @@
             // loadFromFileToolStripMenuItem
             // 
             this.loadFromFileToolStripMenuItem.Name = "loadFromFileToolStripMenuItem";
-            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.loadFromFileToolStripMenuItem.Size = new System.Drawing.Size(214, 30);
             this.loadFromFileToolStripMenuItem.Text = "Load from File";
             this.loadFromFileToolStripMenuItem.Click += new System.EventHandler(this.loadFromFileToolStripMenuItem_Click);
             // 
             // saveToFileToolStripMenuItem
             // 
             this.saveToFileToolStripMenuItem.Name = "saveToFileToolStripMenuItem";
-            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.saveToFileToolStripMenuItem.Size = new System.Drawing.Size(214, 30);
             this.saveToFileToolStripMenuItem.Text = "Save to File";
             this.saveToFileToolStripMenuItem.Click += new System.EventHandler(this.saveToFileToolStripMenuItem_Click);
             // 
@@ -89,21 +90,21 @@
             this.first50ToolStripMenuItem,
             this.first100ToolStripMenuItem});
             this.loadFibonacciToolStripMenuItem.Name = "loadFibonacciToolStripMenuItem";
-            this.loadFibonacciToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.loadFibonacciToolStripMenuItem.Size = new System.Drawing.Size(214, 30);
             this.loadFibonacciToolStripMenuItem.Text = "Load Fibonacci";
             this.loadFibonacciToolStripMenuItem.Click += new System.EventHandler(this.loadFibonacciToolStripMenuItem_Click);
             // 
             // first50ToolStripMenuItem
             // 
             this.first50ToolStripMenuItem.Name = "first50ToolStripMenuItem";
-            this.first50ToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.first50ToolStripMenuItem.Size = new System.Drawing.Size(164, 30);
             this.first50ToolStripMenuItem.Text = "First 50";
             this.first50ToolStripMenuItem.Click += new System.EventHandler(this.first50ToolStripMenuItem_Click);
             // 
             // first100ToolStripMenuItem
             // 
             this.first100ToolStripMenuItem.Name = "first100ToolStripMenuItem";
-            this.first100ToolStripMenuItem.Size = new System.Drawing.Size(252, 30);
+            this.first100ToolStripMenuItem.Size = new System.Drawing.Size(164, 30);
             this.first100ToolStripMenuItem.Text = "First 100";
             this.first100ToolStripMenuItem.Click += new System.EventHandler(this.first100ToolStripMenuItem_Click);
             // 
