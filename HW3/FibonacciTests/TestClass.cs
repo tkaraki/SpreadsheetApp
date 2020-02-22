@@ -23,8 +23,8 @@ namespace FibonacciTests
         [Test]
         public void TestFibonacciSequenceZero()
         {
-            string answer2 = "1: 0";
-            HW3.FibonacciTextReader fibonacci = new HW3.FibonacciTextReader(1);
+            string answer2 = string.Empty;
+            HW3.FibonacciTextReader fibonacci = new HW3.FibonacciTextReader(0);
             Assert.AreEqual(answer2, fibonacci.ReadToEnd());
         }
 
