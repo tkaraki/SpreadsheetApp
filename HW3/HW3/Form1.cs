@@ -99,14 +99,27 @@ namespace HW3
 
         }
 
+        
+        /// <summary>
+        /// Fibonacci Sequence Generators, 50-100
+        /// Passes the Max Num to constructor of FibonacciTextReader class
+        /// and then passes to LoadText to display in textbox
+        /// </summary>
         private void first50ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            using (FibonacciTextReader ftr = new FibonacciTextReader(50))
+            {
+                LoadText(ftr);
+            }
         }
 
         private void first100ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            using (FibonacciTextReader ftr = new FibonacciTextReader(100))
+            {
+                LoadText(ftr);
+            }
         }
+        
     }
 }
