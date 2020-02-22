@@ -9,12 +9,16 @@ namespace FibonacciTests
     [TestFixture]
     public class TestClass
     {
+
         [Test]
-        public void TestMethod()
+        public void TestFibonacciSequence()
         {
-            // TODO: Add your test code here
-            var answer = 42;
-            Assert.That(answer, Is.EqualTo(42), "Some useful error message");
+
+            string answer = "1: 0\r\n2: 1";
+            HW3.FibonacciTextReader fibonacci = new HW3.FibonacciTextReader(2);
+            Assert.AreEqual(answer, fibonacci.ReadToEnd());
+
         }
+
     }
 }
