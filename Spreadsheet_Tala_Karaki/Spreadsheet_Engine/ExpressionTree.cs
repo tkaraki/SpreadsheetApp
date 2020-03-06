@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    class ExpressionTree
+    public class ExpressionTree
     {
         public ExpressionTree(string expression) { }
 

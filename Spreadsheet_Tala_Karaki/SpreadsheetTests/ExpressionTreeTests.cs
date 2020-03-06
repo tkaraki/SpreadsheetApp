@@ -12,9 +12,21 @@ namespace SpreadsheetTests
         [Test]
         public void TestMethod()
         {
-            // TODO: Add your test code here
-            var answer = 42;
-            Assert.That(answer, Is.EqualTo(42), "Some useful error message");
+            // Testing multiple expressions
+            string answer1 = "ABHello6";
+            Spreadsheet_Engine.ExpressionTree expression1 = new Spreadsheet_Engine.ExpressionTree("A+B+C1+Hello+6");
+            Assert.AreEqual(answer1, expression1.Evaluate());
+
+            // Testing multiple expressions
+            string answer2 = "15";
+            Spreadsheet_Engine.ExpressionTree expression2 = new Spreadsheet_Engine.ExpressionTree("4+5+6");
+            Assert.AreEqual(answer2, expression2.Evaluate());
+
+            // Testing multiple expressions
+            string answer3 = "97";
+            Spreadsheet_Engine.ExpressionTree expression3 = new Spreadsheet_Engine.ExpressionTree("100-1-2");
+            Assert.AreEqual(answer3, expression3.Evaluate());
+
         }
     }
 }
