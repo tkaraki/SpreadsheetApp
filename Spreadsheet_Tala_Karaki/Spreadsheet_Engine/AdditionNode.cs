@@ -18,7 +18,7 @@ namespace Spreadsheet_Engine
             }
             catch (Exception e)
             {
-                throw new Exception("Error on Operator Children.");
+                throw new Exception("Error with Operator Children.");
             }
 
         }

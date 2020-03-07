@@ -6,7 +6,21 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    class MultiplicationNode
+    internal class MultiplicationNode : OperatorNode
     {
+        public MultiplicationNode() : base('*') { }
+
+        public override double Evaluate()
+        {
+            try
+            {
+                return this.Left.Evaluate() * this.Right.Evaluate();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error with Operator Children.");
+            }
+        }
     }
+
 }

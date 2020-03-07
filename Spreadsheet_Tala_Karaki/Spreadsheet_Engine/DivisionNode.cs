@@ -6,7 +6,21 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    class DivisionNode
+    internal class DivisionNode : OperatorNode
     {
+        public DivisionNode() : base('/') { }
+
+        public override double Evaluate()
+        {
+            try
+            {
+                return this.Left.Evaluate() / this.Right.Evaluate();
+            }
+            catch (Exception e)
+            {
+                throw new Exception("Error with Operator Children.");
+            }
+        }
     }
+
 }
