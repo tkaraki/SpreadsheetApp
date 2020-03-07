@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    class BaseNode
+    public abstract class BaseNode
     {
+        public abstract double Evaluate();
     }
+
 }

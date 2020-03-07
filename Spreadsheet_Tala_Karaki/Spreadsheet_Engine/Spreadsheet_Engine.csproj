@@ -48,6 +48,7 @@
     <Compile Include="ExpressionTree.cs" />
     <Compile Include="ExpressionTreeFactory.cs" />
     <Compile Include="MultiplicationNode.cs" />
+    <Compile Include="OperatorNode.cs" />
     <Compile Include="SpreadsheetCell.cs" />
     <Compile Include="SpreadsheetEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

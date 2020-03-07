@@ -6,7 +6,18 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    class ConstantNode
+    internal class ConstantNode : BaseNode
     {
+        public double Value { get; set; }
+
+        public ConstantNode(double value)
+        {
+            this.Value = value;
+        }
+
+        public override double Evaluate()
+        {
+            return this.Value;
+        }
     }
 }
