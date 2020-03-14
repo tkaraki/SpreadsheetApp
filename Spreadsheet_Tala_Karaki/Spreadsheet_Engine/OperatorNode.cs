@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    internal abstract class OperatorNode : BaseNode
+    public abstract class OperatorNode : BaseNode
     {
         public char Operator { get; set; }
 
