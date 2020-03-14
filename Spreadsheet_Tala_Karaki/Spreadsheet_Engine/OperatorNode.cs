@@ -14,6 +14,8 @@ namespace Spreadsheet_Engine
 
         public BaseNode Right { get; set; }
 
+        public abstract Int16 Precedence { get; set; }
+
         public OperatorNode(char c)
         {
             this.Operator = c;

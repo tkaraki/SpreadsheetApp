@@ -10,6 +10,8 @@ namespace Spreadsheet_Engine
     {
         public AdditionNode() : base('+') { }
 
+        public override Int16 Precedence { get; set; } = 2;
+
         public override double Evaluate()
         {
             try

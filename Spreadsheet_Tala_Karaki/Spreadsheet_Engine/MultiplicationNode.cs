@@ -10,6 +10,8 @@ namespace Spreadsheet_Engine
     {
         public MultiplicationNode() : base('*') { }
 
+        public override Int16 Precedence { get; set; } = 3;
+
         public override double Evaluate()
         {
             try
