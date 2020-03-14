@@ -23,7 +23,6 @@ namespace Spreadsheet_Engine
             this.Expression = expression;
             this.Variables = new Dictionary<string, double>();
             this.ExpressionTreeRoot = null;
-            this.BuildTree();
         }
 
         /// <summary>
