@@ -23,6 +23,7 @@ namespace Spreadsheet_Engine
             this.Expression = expression;
             this.Variables = new Dictionary<string, double>();
             this.ExpressionTreeRoot = null;
+            this.BuildTree();
         }
 
         /// <summary>
@@ -61,7 +62,7 @@ namespace Spreadsheet_Engine
             }
             else
             {
-                return result;
+                throw new Exception("Error evaluating empty expression.");
             }
         }
 
@@ -94,11 +95,15 @@ namespace Spreadsheet_Engine
                     }
 
                     // if var is an operator create operator node
-                    else
+                    else if (ExpressionTreeFactory.operators.ContainsKey(component[0]))
                     {
                         node = ExpressionTreeFactory.CreateOperatorNode(component[0]);
                         ((OperatorNode)node).Right = stack.Pop();
                         ((OperatorNode)node).Left = stack.Pop();
+                    }
+                    else
+                    {
+                        node = null;
                     }
 
                     stack.Push(node);
@@ -157,26 +162,54 @@ namespace Spreadsheet_Engine
                     index--;
                 }
 
+                else if (token == '(')
+                {
+                    stack.Push(token.ToString());
+                }
+
+                else if (token == ')')
+                {
+                    string buff = "";
+                    while (stack.Count > 0 && ( buff = stack.Pop()) != "(")
+                    {
+                        output.Add(buff);
+                    }
+
+                    if (buff != "(")
+                    {
+                        throw new Exception("Error finding matching paranthesis.");
+
+                    }
+                }
+
                 // token is an operator, push it onto the stack.
                 else if (IsOperator(token))
                 {
                     OperatorNode tempOpNode = ExpressionTreeFactory.CreateOperatorNode(token);
 
-                    while (stack.Count > 0)
+                    while (stack.Count > 0 && IsOperator(stack.Peek()[0]))
                     {
-                        output.Add(stack.Pop());
+                        OperatorNode tempNode = ExpressionTreeFactory.CreateOperatorNode(stack.Peek()[0]);
+                        if (tempNode.Precedence >= tempNode.Precedence)
+                        {
+                            output.Add(stack.Pop());
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
 
-                    stack.Push(token + " ");
+                    stack.Push(token.ToString());
                 }
 
                 // token is a variable name, add it to the variable dictionary
                 else
                 {
-                    string variableNameBuilder = "";
+                    string varName = "";
                     while (!ExpressionTreeFactory.operators.ContainsKey(token) && index < this.Expression.Length)
                     {
-                        variableNameBuilder += token;
+                        varName += token;
                         index++;
                         if (index < this.Expression.Length)
                         {
@@ -184,10 +217,10 @@ namespace Spreadsheet_Engine
                         }
                     }
 
-                    output.Add(variableNameBuilder + " ");
-                    if (!this.Variables.ContainsKey(variableNameBuilder))
+                    output.Add(varName + " ");
+                    if (!this.Variables.ContainsKey(varName))
                     {
-                        this.Variables.Add(variableNameBuilder, 0);
+                        this.Variables.Add(varName, 0);
                     }
 
                     index--;
