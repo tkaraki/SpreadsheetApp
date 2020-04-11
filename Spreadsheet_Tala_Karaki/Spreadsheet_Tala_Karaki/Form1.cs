@@ -30,6 +30,8 @@ namespace Spreadsheet_Tala_Karaki
             this.spreadSheet1 = new SpreadsheetEngine(50, 26);
             this.spreadSheet1.CellPropertyChanged += this.CellPropertyChanged;
             this.InitializeGrid();
+            this.dataGridView1.CellBeginEdit += new DataGridViewCellCancelEventHandler(this.CellBeginEdit);
+            this.dataGridView1.CellEndEdit += new DataGridViewCellEventHandler(this.CellEndEdit);
         }
 
         /// <summary>
@@ -65,7 +67,6 @@ namespace Spreadsheet_Tala_Karaki
             }
         }
 
-
         /// <summary>
         /// Handles what happens when the Demo button is clicked.
         /// </summary>
@@ -73,7 +74,6 @@ namespace Spreadsheet_Tala_Karaki
         {
             this.SpreadsheetDemo();
         }
-
        
         /// <summary>
         /// Runs a Demo of the spreadsheet form.
@@ -104,6 +104,26 @@ namespace Spreadsheet_Tala_Karaki
             }
         }
 
+        private void CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
+        {
+            this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Text;
+        }
+
+        private void CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+           DataGridView grid = (DataGridView)sender;
+           SpreadsheetCell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
+            if (grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
+            {
+                cell.Text = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+            }
+            else
+            {
+                cell.Text = string.Empty;
+            }
+           grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = cell.Value;
+        }
+
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
         }
@@ -111,6 +131,15 @@ namespace Spreadsheet_Tala_Karaki
         private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
         {
 
+        }
+
+        private void OnCellPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            SpreadsheetCell oldCell = (SpreadsheetCell)sender;
+            if (e.PropertyName == "Value")
+            {
+             this.dataGridView1.Rows[oldCell.RowIndex].Cells[oldCell.ColumnIndex].Value = oldCell.Value;
+            }
         }
     }
 }
