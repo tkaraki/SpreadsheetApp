@@ -113,7 +113,7 @@ namespace Spreadsheet_Tala_Karaki
         {
            DataGridView grid = (DataGridView)sender;
            SpreadsheetCell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
-            if (grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
+           if (grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
             {
                 cell.Text = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
             }
@@ -121,6 +121,7 @@ namespace Spreadsheet_Tala_Karaki
             {
                 cell.Text = string.Empty;
             }
+
            grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = cell.Value;
         }
 
