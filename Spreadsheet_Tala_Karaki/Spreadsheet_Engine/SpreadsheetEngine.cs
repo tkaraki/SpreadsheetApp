@@ -97,6 +97,7 @@ namespace Spreadsheet_Engine
                 this.UpdateDependency((Cell)sender);
                 this.CellPropertyChanged?.Invoke(sender, new PropertyChangedEventArgs("Value"));
             }
+
         }
 
         /// <summary>

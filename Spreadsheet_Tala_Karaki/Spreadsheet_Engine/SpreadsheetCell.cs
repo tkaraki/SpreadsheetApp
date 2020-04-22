@@ -16,6 +16,14 @@ namespace Spreadsheet_Engine
         private readonly int columnIndex = 0;
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event DependencyChangedEventHandler DependencyChanged = delegate { };
+        public delegate void DependencyChangedEventHandler(object sender);
+        protected void OnPropertyChanged(string name)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            this.DependencyChanged?.Invoke(this);
+        }
+
 
         /// <summary>
         /// Constructor for Abstract SpreadsheetCell class.
@@ -98,6 +106,8 @@ namespace Spreadsheet_Engine
         {
         }
     }
-
+    
+  
+    
 }
 
