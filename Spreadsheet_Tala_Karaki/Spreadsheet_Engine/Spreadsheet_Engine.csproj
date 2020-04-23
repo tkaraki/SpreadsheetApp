@@ -44,12 +44,13 @@
     <Compile Include="AdditionNode.cs" />
     <Compile Include="BaseNode.cs" />
     <Compile Include="ConstantNode.cs" />
-    <Compile Include="DependencyNode.cs" />
     <Compile Include="DivisionNode.cs" />
     <Compile Include="ExpressionTree.cs" />
     <Compile Include="ExpressionTreeFactory.cs" />
+    <Compile Include="LeftParenthesisNode.cs" />
     <Compile Include="MultiplicationNode.cs" />
     <Compile Include="OperatorNode.cs" />
+    <Compile Include="RightParenthesisNode.cs" />
     <Compile Include="SpreadsheetCell.cs" />
     <Compile Include="SpreadsheetEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

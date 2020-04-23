@@ -7,6 +7,7 @@
 namespace Spreadsheet_Engine
 {
     using System.ComponentModel;
+    using System.Collections.Generic;
 
     public abstract class SpreadsheetCell : INotifyPropertyChanged
     {
@@ -15,9 +16,14 @@ namespace Spreadsheet_Engine
         private readonly int rowIndex = 0;
         private readonly int columnIndex = 0;
 
+        protected ExpressionTree tree;
+        private Dictionary<int, string> location = new Dictionary<int, string>();
+        public Dictionary<string, double> varNames = new Dictionary<string, double>();
+
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         public event DependencyChangedEventHandler DependencyChanged = delegate { };
         public delegate void DependencyChangedEventHandler(object sender);
+
         protected void OnPropertyChanged(string name)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -37,6 +43,14 @@ namespace Spreadsheet_Engine
             this.columnIndex = cIndex;
             this.text = text;
             this.value = text;
+
+            // add all of the key values to the dictionary to easily find cells with later.
+            int k = 0;
+            for (int i = 65; i < 91; i++)
+            {
+                this.location.Add(k, ((char)i).ToString());
+                ++k;
+            }
         }
 
 
@@ -53,6 +67,14 @@ namespace Spreadsheet_Engine
             get
             {
                 return this.columnIndex;
+            }
+        }
+
+        public string IndexName
+        {
+            get
+            {
+                return this.location[this.ColumnIndex].ToString() + (this.RowIndex + 1).ToString();
             }
         }
 
@@ -90,6 +112,7 @@ namespace Spreadsheet_Engine
             }
         }
     }
+
 
     // Cell Class inherited from SpreadSheet to be instantiated in Spreadsheet
     public class Cell : SpreadsheetCell

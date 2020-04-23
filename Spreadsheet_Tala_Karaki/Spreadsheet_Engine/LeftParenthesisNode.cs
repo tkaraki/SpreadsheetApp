@@ -6,23 +6,22 @@ using System.Threading.Tasks;
 
 namespace Spreadsheet_Engine
 {
-    internal class AdditionNode : OperatorNode
+    internal class LeftParenthesisNode: OperatorNode
     {
-        public AdditionNode() : base('+') { }
+        public LeftParenthesisNode() : base('(') { }
 
-        public override Int16 Precedence { get; } = 0;
+        public override Int16 Precedence { get; } = 2;
 
         public override double Evaluate(double left, double right)
         {
             try
             {
-                return left + right;
+                return right;
             }
             catch (Exception e)
             {
-                throw new Exception("Error with Addition Operator.");
+                throw new Exception("Error with paranthesis.");
             }
-
         }
     }
 }

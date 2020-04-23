@@ -10,17 +10,17 @@ namespace Spreadsheet_Engine
     {
         public DivisionNode() : base('/') { }
 
-        public override Int16 Precedence { get; set; } = 3;
+        public override Int16 Precedence { get; } = 1;
 
-        public override double Evaluate()
+        public override double Evaluate(double left, double right)
         {
             try
             {
-                return this.Left.Evaluate() / this.Right.Evaluate();
+                return right / left;
             }
             catch (Exception e)
             {
-                throw new Exception("Error with Operator Children.");
+                throw new Exception("Error with Division Operator.");
             }
         }
     }

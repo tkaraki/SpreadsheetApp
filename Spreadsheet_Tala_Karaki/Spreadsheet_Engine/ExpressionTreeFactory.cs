@@ -8,29 +8,46 @@ namespace Spreadsheet_Engine
 {
     internal class ExpressionTreeFactory
     {
-        public static Dictionary<char, Type> operators = new Dictionary<char, Type>
+        public static OperatorNode CreateOperatorNode(char op)
         {
-            { '*', typeof(MultiplicationNode) },
-            { '/', typeof(DivisionNode) },
-            { '+', typeof(AdditionNode) },
-            { '-', typeof(SubtractionNode) },
-        };
-
-        public static OperatorNode CreateOperatorNode(char c)
-        {
-            if (operators.ContainsKey(c))
+            switch (op)
             {
-                object operatorNodeChild = System.Activator.CreateInstance(operators[c]);
-                if (operatorNodeChild is OperatorNode)
-                {
-                    return (OperatorNode)operatorNodeChild;
-                }
-
-                throw new Exception("Invalid Operator");
+                case '-':
+                    return new SubtractionNode();
+                case '+':
+                    return new AdditionNode();
+                case '*':
+                    return new MultiplicationNode();
+                case '/':
+                    return new DivisionNode();
+                case '(':
+                    return new LeftParenthesisNode();
+                case ')':
+                    return new RightParenthesisNode();
             }
 
             return null;
         }
-    }
 
+        public static bool IsValidOperator(char op)
+        {
+            switch (op)
+            {
+                case '-':
+                    return true;
+                case '+':
+                    return true;
+                case '*':
+                    return true;
+                case '/':
+                    return true;
+                case '(':
+                    return true;
+                case ')':
+                    return true;
+            }
+
+            return false;
+        }
+    }
 }

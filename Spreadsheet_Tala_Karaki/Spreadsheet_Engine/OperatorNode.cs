@@ -14,7 +14,7 @@ namespace Spreadsheet_Engine
 
         public BaseNode Right { get; set; }
 
-        public abstract Int16 Precedence { get; set; }
+        public abstract Int16 Precedence { get; }
 
         public OperatorNode(char c)
         {
@@ -22,7 +22,7 @@ namespace Spreadsheet_Engine
             this.Left = this.Right = null;
         }
 
-        public abstract override double Evaluate();
+        public abstract double Evaluate(double left, double right);
 
     }
 }

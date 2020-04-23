@@ -8,7 +8,6 @@ namespace Spreadsheet_Engine
 {
     public abstract class BaseNode
     {
-        public abstract double Evaluate();
     }
 
 }

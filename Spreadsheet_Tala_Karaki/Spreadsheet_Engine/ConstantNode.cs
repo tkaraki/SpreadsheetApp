@@ -14,10 +14,5 @@ namespace Spreadsheet_Engine
         {
             this.Value = value;
         }
-
-        public override double Evaluate()
-        {
-            return this.Value;
-        }
     }
 }
