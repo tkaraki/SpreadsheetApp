@@ -17,21 +17,13 @@ namespace Spreadsheet_Engine
         private readonly int columnIndex = 0;
 
         protected ExpressionTree tree;
-        private Dictionary<int, string> location = new Dictionary<int, string>();
+        private Dictionary<int, string> cellLocation = new Dictionary<int, string>();
         public Dictionary<string, double> varNames = new Dictionary<string, double>();
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public event DependencyChangedEventHandler DependencyChanged = delegate { };
-        public delegate void DependencyChangedEventHandler(object sender);
-
-        protected void OnPropertyChanged(string name)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-            this.DependencyChanged?.Invoke(this);
-        }
-
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="SpreadsheetCell"/> class.
         /// Constructor for Abstract SpreadsheetCell class.
         /// </summary>
         /// <param name="rIndex">cell row index</param>
@@ -44,11 +36,11 @@ namespace Spreadsheet_Engine
             this.text = text;
             this.value = text;
 
-            // add all of the key values to the dictionary to easily find cells with later.
+            // Set up dictionary with cell indexes to find cells faster.
             int k = 0;
             for (int i = 65; i < 91; i++)
             {
-                this.location.Add(k, ((char)i).ToString());
+                this.cellLocation.Add(k, ((char)i).ToString());
                 ++k;
             }
         }
@@ -74,7 +66,7 @@ namespace Spreadsheet_Engine
         {
             get
             {
-                return this.location[this.ColumnIndex].ToString() + (this.RowIndex + 1).ToString();
+                return this.cellLocation[this.ColumnIndex].ToString() + (this.RowIndex + 1).ToString();
             }
         }
 
@@ -113,7 +105,6 @@ namespace Spreadsheet_Engine
         }
     }
 
-
     // Cell Class inherited from SpreadSheet to be instantiated in Spreadsheet
     public class Cell : SpreadsheetCell
     {
@@ -128,9 +119,22 @@ namespace Spreadsheet_Engine
                 : base(rindex, cindex, name)
         {
         }
-    }
-    
-  
-    
-}
 
+        public void SubscribeTreeToCell(Cell cell)
+        {
+            this.tree.SubscribeToCell(cell);
+        }
+
+        public void NewExpression(string exp)
+        {
+            this.tree = new ExpressionTree(exp);
+            this.varNames = this.tree.Variables;
+            this.tree.parent = this;
+        }
+
+        public string ComputeExpression()
+        {
+            return this.tree.Evaluate().ToString();
+        }
+    }
+}

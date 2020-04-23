@@ -28,7 +28,7 @@ namespace Spreadsheet_Tala_Karaki
         private void Form1_Load(object sender, EventArgs e)
         {
             this.spreadSheet1 = new SpreadsheetEngine(50, 26);
-            this.spreadSheet1.CellPropertyChanged += this.CellPropertyChanged;
+            this.spreadSheet1.PropertyChanged += this.CellPropertyChanged;
             this.InitializeGrid();
             this.dataGridView1.CellBeginEdit += new DataGridViewCellCancelEventHandler(this.CellBeginEdit);
             this.dataGridView1.CellEndEdit += new DataGridViewCellEventHandler(this.CellEndEdit);
@@ -60,10 +60,11 @@ namespace Spreadsheet_Tala_Karaki
         /// </summary>
         private void CellPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            Cell cell = (Cell)sender;
-            if (e.PropertyName == "Value")
+            if (sender.GetType() == typeof(SpreadsheetEngine))
             {
-                this.dataGridView1.Rows[cell.RowIndex].Cells[cell.ColumnIndex].Value = cell.Value;
+                string temp = e.PropertyName; 
+                string[] values = temp.Split(','); 
+                this.dataGridView1.Rows[Convert.ToInt32(values[0])].Cells[Convert.ToInt32(values[1])].Value = values[2];
             }
         }
 

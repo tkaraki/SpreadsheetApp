@@ -57,29 +57,34 @@ namespace Spreadsheet_Engine
             }
         }
 
-        // private method to evaluate the tree.
-        private double Evaluate(BaseNode theNode)
+        /// <summary>
+        /// Private method to evaluate the tree.
+        /// </summary>
+        /// <returns>Evaluation value of tree.</returns>
+        private double Evaluate(BaseNode treeNode)
         {
-            // Evaluate left and right nodes if theNode is an operator.
-            if (theNode != null && theNode is OperatorNode)
+            if (treeNode != null)
             {
-                OperatorNode temp = (OperatorNode)theNode;
+                // If node is operator, evaluate left and right nodes
+                if (treeNode is OperatorNode)
+                {
+                    OperatorNode op = (OperatorNode)treeNode;
+                    return op.Evaluate(this.Evaluate(op.Left), this.Evaluate(op.Right));
+                }
 
-                return temp.Evaluate(this.Evaluate(temp.Left), this.Evaluate(temp.Right));
-            }
+                // If node is variable, return value from dictionary
+                if (treeNode is VariableNode)
+                {
+                    VariableNode val = (VariableNode)treeNode;
+                    return this.Variables[val.Name];
+                }
 
-            // Return the value of theNode after looking for it in the dictionary if it is a variable.
-            if (theNode != null && theNode is VariableNode)
-            {
-                VariableNode temp = (VariableNode)theNode;
-                return this.Variables[temp.Name];
-            }
-
-            // Return the value of theNode if it is a constant.
-            if (theNode != null && theNode is ConstantNode)
-            {
-                ConstantNode temp = (ConstantNode)theNode;
-                return temp.Value;
+                // If node is constant, return value
+                if (treeNode is ConstantNode)
+                {
+                    ConstantNode cons = (ConstantNode)treeNode;
+                    return cons.Value;
+                }
             }
 
             return 0;
@@ -88,23 +93,21 @@ namespace Spreadsheet_Engine
         /// <summary>
         /// Builds the expression tree to be compiled.
         /// </summary>
-        private BaseNode BuildTree(BaseNode cur)
+        /// <returns> treeNode if not operator node.</returns>
+        private BaseNode BuildTree(BaseNode treeNode)
         {
-            if (cur is OperatorNode)
+            if (treeNode is OperatorNode)
             {
-                OperatorNode temp = (OperatorNode)cur;
+                OperatorNode temp = (OperatorNode)treeNode;
                 temp.Left = this.BuildTree(this.postFixExpressionStack.Pop());
                 temp.Right = this.BuildTree(this.postFixExpressionStack.Pop());
             }
-            else
-            {
-            }
 
-            return cur;
+            return treeNode;
         }
 
         /// <summary>
-        /// Determines if the operator is valid.
+        /// Determines if the operator is valid from expression tree factory.
         /// </summary>
         /// <returns>True if valid.</returns>
         /// <returns>False if not valid.</returns>
@@ -115,9 +118,12 @@ namespace Spreadsheet_Engine
 
         private void DoCompile(string expression)
         {
-            this.Compile(expression);
+            if (expression.Length != 0)
+            {
+                this.Compile(expression);
+            }
 
-            // 7. At the end of the expression, pop and print all operators on the stack. (No parentheses should remain.)
+            // Clear all operators from stack
             while (this.opStack.Count > 0)
             {
                 this.postFixExpressionStack.Push(this.opStack.Pop());
@@ -125,150 +131,117 @@ namespace Spreadsheet_Engine
         }
 
         /// <summary>
-        /// Compiles a postfix expression using shunting yard algorithm from https://www.geeksforgeeks.org/expression-evaluation/.
+        /// Compiles a postfix expression using shunting yard algorithm.
         /// </summary>
         private void Compile(string expression)
         {
-            double number;
+            string segment = string.Empty;
+            double num = 0.0;
             int operatorIndex = 0;
-            string sub = string.Empty;
 
-            // Checks if expression holds anything
-            if (expression.Length != 0)
+            for (int i = 0; i < expression.Length; i++)
             {
-                for (int i = 0; i < expression.Length; i++)
+                operatorIndex = i;
+
+                // Find the first occurence of an operator
+                while (operatorIndex < expression.Length && !ExpressionTreeFactory.IsValidOperator(expression[operatorIndex]))
                 {
-                    operatorIndex = i;
+                    operatorIndex++;
+                }
 
-                    // Looks for type of first operator inside the expression
-                    while (operatorIndex < expression.Length && !ExpressionTreeFactory.IsValidOperator(expression[operatorIndex]))
+                // If operator is equivalent to i, then store it in a string segment
+                if (operatorIndex == i)
+                {
+                    segment = expression[i].ToString();
+                }
+
+                // Else store the expression in a segment
+                else
+                {
+                    segment = expression.Substring(i, operatorIndex - i);
+                    if (operatorIndex - i > 1)
                     {
-                        operatorIndex++;
+                        i += operatorIndex - i;
+                        i--;
                     }
+                }
 
-                    // if the operartorIndex is the same as the i than expression[i] is an operator and the else statement wouldn't normally process this correctly.
-                    if (operatorIndex == i)
+                // Find all other operators.
+                if (ExpressionTreeFactory.IsValidOperator(segment[0]))
+                {
+                    // Create operatorNode and distribute expression to other nodes
+                    OperatorNode newNode = ExpressionTreeFactory.CreateOperatorNode(segment[0]);
+                    
+                    if (newNode.Operator == '(')
                     {
-                        sub = expression[i].ToString();
+                        this.opStack.Push(newNode);
                     }
-
-                    // finds the correct substring otherwise
-                    else
+                    
+                    else if (newNode.Operator == ')')
                     {
-                        sub = expression.Substring(i, operatorIndex - i);
-                        if (operatorIndex - i > 1)
+                        while ((char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) != '(')
                         {
-                            i += operatorIndex - i;
-                            i--;
-                        }
-                    }
-
-                    // Checks for any other operator. operatorIndex will be greater than
-                    // expression.Length if no operator is found
-                    if (ExpressionTreeFactory.IsValidOperator(sub[0]))
-                    {
-                        // Creates operator node and divides expression accordingly
-                        OperatorNode newNode = ExpressionTreeFactory.CreateOperatorNode(sub[0]);
-
-                        // newNode.Left = this.Compile(expression.Substring(0, operatorIndex));
-                        // newNode.Right = this.Compile(expression.Substring(operatorIndex + 1));
-
-                        // 2. If the incoming symbol is a left parentheses, push it on the stack.
-                        if (newNode.Operator == '(')
-                        {
-                            this.opStack.Push(newNode);
+                            this.postFixExpressionStack.Push(this.opStack.Pop());
                         }
 
-                        // 3. If the incoming symbol is a right parenthesis: discard the right parenthesis,
-                        //    pop and print the stack symbols until you see a left parenthesis.
-                        //    Pop the left parenthesis and discard it.
-                        else if (newNode.Operator == ')')
-                        {
-                            while ((char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) != '(')
-                            {
-                                this.postFixExpressionStack.Push(this.opStack.Pop());
-                            }
-
-                            this.opStack.Pop();
-                        }
-
-                        // 4. If the incoming symbol is an operator and the stack is empty or contains a left parentheses on top,
-                        //    push the incoming operator onto the stack.
-                        else if (this.opStack.Count == 0 || (char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) == '(')
-                        {
-                            this.opStack.Push(newNode);
-                        }
-
-                        // 5. If the incoming symbol is an operator and has either higher precedence than the operator on the top of the stack,
-                        //    or has the same precedence as the operator on the top of the stack and is right associative--push it on the stack.
-                        else if (newNode.Precedence > (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
-                            (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
-                        {
-                            this.opStack.Push(newNode);
-                        }
-
-                        // 6. If the incoming symbol is an operator and has either lower precedence than the operator on the top of the stack,
-                        //    or has the same precedence as the operator on the top of the stack and is left associative--continue to pop the
-                        //    stack until this is not true. Then, push the incoming operator.
-                        else if (newNode.Precedence < (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
-                            (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
-                        {
-                            // OperatorNode temp = (OperatorNode)this.opStack.Peek();
-                            while (this.opStack.Count > 0 && ((OperatorNode)this.opStack.Peek()).Operator != '(' && ((OperatorNode)this.opStack.Peek()).Precedence >= newNode.Precedence)
-                            {
-                                this.postFixExpressionStack.Push(this.opStack.Pop());
-                            }
-
-                            this.opStack.Push(newNode);
-                        }
-
-                        // return newNode;
+                        this.opStack.Pop();
                     }
-
-                    // 1. If the incoming symbols is an operand, output it..
-
-                    // Checks if the expression contains only a number
-                    else if (double.TryParse(sub, out number))
+                    
+                    else if (this.opStack.Count == 0 || (char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) == '(')
                     {
-                        // Creates new constant node to return
-                        ConstantNode newNode = new ConstantNode(number);
-                        newNode.Value = number;
-
-                        this.postFixExpressionStack.Push(newNode);
-
-                        // return newNode;
+                        this.opStack.Push(newNode);
                     }
-
-                    // Checks if the expression contains only a variable
-                    else
+                    
+                    else if (newNode.Precedence > (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
+                        (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
                     {
-                        // Creates new variable node to return
-                        VariableNode newNode = new VariableNode(sub);
-                        this.Variables[sub] = 0.0;
+                        this.opStack.Push(newNode);
+                    }
+                    
+                    else if (newNode.Precedence < (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
+                        (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
+                    {
+                        while (this.opStack.Count > 0 && ((OperatorNode)this.opStack.Peek()).Operator != '(' && ((OperatorNode)this.opStack.Peek()).Precedence >= newNode.Precedence)
+                        {
+                            this.postFixExpressionStack.Push(this.opStack.Pop());
+                        }
 
-                        this.postFixExpressionStack.Push(newNode);
-
-                        // return newNode;
+                        this.opStack.Push(newNode);
                     }
 
-                    // this.Compile(expression.Substring(0, operatorIndex));
-                    // this.Compile(expression.Substring(operatorIndex + 1));
+                }
+
+                // Else if the expression is just a number, create a constant node
+                else if (double.TryParse(segment, out num))
+                {
+                    ConstantNode newNode = new ConstantNode(num);
+                    newNode.Value = num;
+
+                    this.postFixExpressionStack.Push(newNode);
+                }
+
+                // Else the expression is just a variable, create a variable node
+                else
+                {
+                    VariableNode newNode = new VariableNode(segment);
+                    this.Variables[segment] = 0.0;
+
+                    this.postFixExpressionStack.Push(newNode);
                 }
             }
-
-            // Returns null if the expression is empty
-            // return null;
         }
 
-        // Subscribes the expression tree to the property changed event of a cell. Also sets the variables in the expression tree to the corresponding
-        // cells in the spreadsheet.
+        /// <summary>
+        /// Subscribes the expression tree to the property changed event of a cell.
+        /// Sets the variables in the expression tree to the corresponding cells in the spreadsheet.
+        /// </summary>
         public void SubscribeToCell(Cell cell)
         {
             cell.PropertyChanged += this.CellChanged;
 
             if (this.Variables.ContainsKey(cell.IndexName))
             {
-                // sets the variable in the dict to the value of the cell if it is a double or 0 if it is not.
+                // Set the variable in the dict to the value of the cell.
                 if (double.TryParse(cell.Value, out double num))
                 {
                     this.Variables[cell.IndexName] = num;
@@ -280,7 +253,9 @@ namespace Spreadsheet_Engine
             }
         }
 
-        // This event fires when a cell that has been subscribed to has been changed.
+        /// <summary>
+        /// Updates all other cells that depend on a cell that has changed.
+        /// </summary>
         private void CellChanged(object sender, EventArgs e)
         {
             if (sender.GetType() == typeof(Cell))
@@ -289,7 +264,7 @@ namespace Spreadsheet_Engine
 
                 if (this.Variables.ContainsKey(cell.IndexName))
                 {
-                    // sets the variable in the dict to the value of the cell if it is a double or 0 if it is not.
+                    // Set the variable in the dict to the value of the cell.
                     if (double.TryParse(cell.Value, out double num))
                     {
                         this.Variables[cell.IndexName] = num;
@@ -299,7 +274,7 @@ namespace Spreadsheet_Engine
                         this.Variables[cell.IndexName] = 0.0;
                     }
 
-                    // The expression has changed so the value of the cell that this tree belongs to must also change.
+                    // Update cell expression tree
                     this.parent.Value = this.Evaluate().ToString();
                 }
             }
