@@ -28,7 +28,7 @@ namespace SpreadsheetTests
         }
 
         [Test]
-        public void Test1()
+        public void TestCellDependency()
         {
             //test constant values
             A1.Text = "10";
@@ -55,6 +55,28 @@ namespace SpreadsheetTests
             D1.Text = "10";
             Assert.AreEqual("14", C1.Value);
             Assert.AreEqual("24", B1.Value);
+        }
+
+        [Test]
+        public void TestUndoRedo()
+        {
+            A1.Text = "10";
+            Assert.AreEqual(A1.Text, A1.Value);
+            
+            B1.Text = "=10+6";
+            Assert.AreEqual(B1.Value, "16");
+            
+            C1.Text = "=B1";
+            Assert.AreEqual(B1.Value, C1.Value);
+
+            spreadsheet.Undo();
+            Assert.AreEqual("0", C1.Value);
+            Assert.AreEqual(B1.Value, "16");
+
+            spreadsheet.Undo();
+            Assert.AreEqual(B1.Value, "0");
+
+
         }
 
     }
