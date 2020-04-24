@@ -25,7 +25,7 @@ namespace Spreadsheet_Engine
         {
             this.Expression = expression;
             this.Variables = new Dictionary<string, double>();
-            this.DoCompile(expression);
+            this.Compile(expression);
             this.root = this.postFixExpressionStack.Pop();
             this.root = this.BuildTree(this.root);
         }
@@ -116,118 +116,110 @@ namespace Spreadsheet_Engine
             return (ExpressionTreeFactory.CreateOperatorNode(symbol) != null);
         }
 
-        private void DoCompile(string expression)
-        {
-            if (expression.Length != 0)
-            {
-                this.Compile(expression);
-            }
-
-            // Clear all operators from stack
-            while (this.opStack.Count > 0)
-            {
-                this.postFixExpressionStack.Push(this.opStack.Pop());
-            }
-        }
-
-        /// <summary>
-        /// Compiles a postfix expression using shunting yard algorithm.
-        /// </summary>
         private void Compile(string expression)
         {
             string segment = string.Empty;
             double num = 0.0;
             int operatorIndex = 0;
 
-            for (int i = 0; i < expression.Length; i++)
+            if (expression.Length != 0)
             {
-                operatorIndex = i;
-
-                // Find the first occurence of an operator
-                while (operatorIndex < expression.Length && !ExpressionTreeFactory.IsValidOperator(expression[operatorIndex]))
+                for (int i = 0; i < expression.Length; i++)
                 {
-                    operatorIndex++;
-                }
+                    operatorIndex = i;
 
-                // If operator is equivalent to i, then store it in a string segment
-                if (operatorIndex == i)
-                {
-                    segment = expression[i].ToString();
-                }
-
-                // Else store the expression in a segment
-                else
-                {
-                    segment = expression.Substring(i, operatorIndex - i);
-                    if (operatorIndex - i > 1)
+                    // Find the first occurence of an operator
+                    while (operatorIndex < expression.Length && !ExpressionTreeFactory.IsValidOperator(expression[operatorIndex]))
                     {
-                        i += operatorIndex - i;
-                        i--;
+                        operatorIndex++;
                     }
-                }
 
-                // Find all other operators.
-                if (ExpressionTreeFactory.IsValidOperator(segment[0]))
-                {
-                    // Create operatorNode and distribute expression to other nodes
-                    OperatorNode newNode = ExpressionTreeFactory.CreateOperatorNode(segment[0]);
-                    
-                    if (newNode.Operator == '(')
+                    // If operator is equivalent to i, then store it in a string segment
+                    if (operatorIndex == i)
                     {
-                        this.opStack.Push(newNode);
+                        segment = expression[i].ToString();
                     }
-                    
-                    else if (newNode.Operator == ')')
+
+                    // Else store the expression in a segment
+                    else
                     {
-                        while ((char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) != '(')
+                        segment = expression.Substring(i, operatorIndex - i);
+                        if (operatorIndex - i > 1)
                         {
-                            this.postFixExpressionStack.Push(this.opStack.Pop());
+                            i += operatorIndex - i;
+                            i--;
+                        }
+                    }
+
+                    // Find all other operators.
+                    if (ExpressionTreeFactory.IsValidOperator(segment[0]))
+                    {
+                        // Create operatorNode and distribute expression to other nodes
+                        OperatorNode newNode = ExpressionTreeFactory.CreateOperatorNode(segment[0]);
+
+                        if (newNode.Operator == '(')
+                        {
+                            this.opStack.Push(newNode);
                         }
 
-                        this.opStack.Pop();
-                    }
-                    
-                    else if (this.opStack.Count == 0 || (char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) == '(')
-                    {
-                        this.opStack.Push(newNode);
-                    }
-                    
-                    else if (newNode.Precedence > (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
-                        (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
-                    {
-                        this.opStack.Push(newNode);
-                    }
-                    
-                    else if (newNode.Precedence < (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
-                        (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
-                    {
-                        while (this.opStack.Count > 0 && ((OperatorNode)this.opStack.Peek()).Operator != '(' && ((OperatorNode)this.opStack.Peek()).Precedence >= newNode.Precedence)
+                        else if (newNode.Operator == ')')
                         {
-                            this.postFixExpressionStack.Push(this.opStack.Pop());
+                            while ((char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) != '(')
+                            {
+                                this.postFixExpressionStack.Push(this.opStack.Pop());
+                            }
+
+                            this.opStack.Pop();
                         }
 
-                        this.opStack.Push(newNode);
+                        else if (this.opStack.Count == 0 || (char)this.opStack.Peek().GetType().GetProperty("Operator").GetValue(this.opStack.Peek()) == '(')
+                        {
+                            this.opStack.Push(newNode);
+                        }
+
+                        else if (newNode.Precedence > (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
+                            (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
+                        {
+                            this.opStack.Push(newNode);
+                        }
+
+                        else if (newNode.Precedence < (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
+                            (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
+                        {
+                            while (this.opStack.Count > 0 && ((OperatorNode)this.opStack.Peek()).Operator != '(' && ((OperatorNode)this.opStack.Peek()).Precedence >= newNode.Precedence)
+                            {
+                                this.postFixExpressionStack.Push(this.opStack.Pop());
+                            }
+
+                            this.opStack.Push(newNode);
+                        }
+
                     }
 
+                    // Else if the expression is just a number, create a constant node
+                    else if (double.TryParse(segment, out num))
+                    {
+                        ConstantNode newNode = new ConstantNode(num);
+                        newNode.Value = num;
+
+                        this.postFixExpressionStack.Push(newNode);
+                    }
+
+                    // Else the expression is just a variable, create a variable node
+                    else
+                    {
+                        VariableNode newNode = new VariableNode(segment);
+                        this.Variables[segment] = 0.0;
+
+                        this.postFixExpressionStack.Push(newNode);
+                    }
                 }
+            }
 
-                // Else if the expression is just a number, create a constant node
-                else if (double.TryParse(segment, out num))
-                {
-                    ConstantNode newNode = new ConstantNode(num);
-                    newNode.Value = num;
-
-                    this.postFixExpressionStack.Push(newNode);
-                }
-
-                // Else the expression is just a variable, create a variable node
-                else
-                {
-                    VariableNode newNode = new VariableNode(segment);
-                    this.Variables[segment] = 0.0;
-
-                    this.postFixExpressionStack.Push(newNode);
-                }
+            // Clear all operators from stack
+            while (this.opStack.Count > 0)
+            {
+                this.postFixExpressionStack.Push(this.opStack.Pop());
             }
         }
 

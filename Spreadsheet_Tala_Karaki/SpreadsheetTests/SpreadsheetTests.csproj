@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExpressionTreeTests.cs" />
+    <Compile Include="SpreadsheetTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -49,6 +50,10 @@
     <ProjectReference Include="..\Spreadsheet_Engine\Spreadsheet_Engine.csproj">
       <Project>{9c847a1c-9e85-4b18-92fd-764f38364d1a}</Project>
       <Name>Spreadsheet_Engine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Spreadsheet_Tala_Karaki\Spreadsheet_Tala_Karaki.csproj">
+      <Project>{8a3163ee-58dd-4733-af7f-622b9bb7e87f}</Project>
+      <Name>Spreadsheet_Tala_Karaki</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
