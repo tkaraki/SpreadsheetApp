@@ -7,6 +7,7 @@ namespace Spreadsheet_Tala_Karaki
 {
     using System;
     using System.ComponentModel;
+    using System.Drawing;
     using System.Windows.Forms;
     using Spreadsheet_Engine;
 
@@ -53,6 +54,8 @@ namespace Spreadsheet_Tala_Karaki
                 this.dataGridView1.Columns[i].Name = c.ToString();
                 c++;
             }
+
+            this.dataGridView1.RowHeadersWidth = 60;
         }
 
         /// <summary>
@@ -141,6 +144,17 @@ namespace Spreadsheet_Tala_Karaki
             if (e.PropertyName == "Value")
             {
              this.dataGridView1.Rows[oldCell.RowIndex].Cells[oldCell.ColumnIndex].Value = oldCell.Value;
+            }
+        }
+
+        private void changeBackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ColorDialog CDialogue = new ColorDialog();
+            Color selected = Color.White;
+
+            if (CDialogue.ShowDialog() == DialogResult.OK)
+            {
+                selected = CDialogue.Color;
             }
         }
     }

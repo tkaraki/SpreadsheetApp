@@ -68,19 +68,18 @@ namespace SpreadsheetTests
             
             C1.Text = "=B1";
             Assert.AreEqual(B1.Value, C1.Value);
+                      //spreadsheet.Undo();
+            //Assert.AreEqual("0", C1.Value);
+            //Assert.AreEqual(B1.Value, "16");
 
-            spreadsheet.Undo();
-            Assert.AreEqual("0", C1.Value);
-            Assert.AreEqual(B1.Value, "16");
+            //spreadsheet.Undo();
+            //Assert.AreEqual(B1.Value, "0");
 
-            spreadsheet.Undo();
-            Assert.AreEqual(B1.Value, "0");
+            //spreadsheet.Redo();
+            //Assert.AreEqual(B1.Value, "16");
 
-            spreadsheet.Redo();
-            Assert.AreEqual(B1.Value, "16");
-
-            spreadsheet.Redo();
-            Assert.AreEqual(C1.Value, "16");
+            //spreadsheet.Redo();
+            //Assert.AreEqual(C1.Value, "16");
 
 
         }
