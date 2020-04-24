@@ -55,6 +55,7 @@
     <Compile Include="SpreadsheetEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SubtractionNode.cs" />
+    <Compile Include="UndoRedo.cs" />
     <Compile Include="VariableNode.cs" />
   </ItemGroup>
   <ItemGroup>
