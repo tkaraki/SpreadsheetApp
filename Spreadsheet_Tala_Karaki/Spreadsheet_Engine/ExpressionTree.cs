@@ -177,14 +177,14 @@ namespace Spreadsheet_Engine
                             this.opStack.Push(newNode);
                         }
 
-                        else if (newNode.Precedence > (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
-                            (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
+                        else if (newNode.Precedence > (Int16)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
+                            (newNode.Precedence == (Int16)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
                         {
                             this.opStack.Push(newNode);
                         }
 
-                        else if (newNode.Precedence < (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
-                            (newNode.Precedence == (ushort)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
+                        else if (newNode.Precedence < (Int16)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek()) ||
+                            (newNode.Precedence == (Int16)this.opStack.Peek().GetType().GetProperty("Precedence").GetValue(this.opStack.Peek())))
                         {
                             while (this.opStack.Count > 0 && ((OperatorNode)this.opStack.Peek()).Operator != '(' && ((OperatorNode)this.opStack.Peek()).Precedence >= newNode.Precedence)
                             {
