@@ -68,7 +68,7 @@ namespace SpreadsheetTests
             
             C1.Text = "=B1";
             Assert.AreEqual(B1.Value, C1.Value);
-                      //spreadsheet.Undo();
+            //spreadsheet.Undo();
             //Assert.AreEqual("0", C1.Value);
             //Assert.AreEqual(B1.Value, "16");
 
@@ -83,6 +83,18 @@ namespace SpreadsheetTests
 
 
         }
+
+
+        [Test]
+        public void TestSaveLoad()
+        {
+            saveText = "<spreadsheet> <cell name=“B1”> <bgcolor>FF8000FF</bgcolor> <text>=A1+6</text> </cell> </spreadsheet>";
+            savefunction = spreadsheet.save();
+            Assert.AreEqual(saveText, savefunction);
+            
+        }
+
+        
 
     }
 }
