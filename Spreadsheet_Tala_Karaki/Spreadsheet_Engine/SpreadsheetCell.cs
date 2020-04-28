@@ -15,7 +15,7 @@ namespace Spreadsheet_Engine
         protected string value = string.Empty;
         private readonly int rowIndex = 0;
         private readonly int columnIndex = 0;
-
+        protected uint bgcolor = 0xFFFFFFFF;
         protected ExpressionTree tree;
         private Dictionary<int, string> cellLocation = new Dictionary<int, string>();
         public Dictionary<string, double> varNames = new Dictionary<string, double>();
@@ -103,6 +103,24 @@ namespace Spreadsheet_Engine
                 }
             }
         }
+
+        public uint BGColor
+        {
+            get
+            {
+                return this.bgcolor;
+            }
+
+            set
+            {
+                if (value != this.bgcolor)
+                {
+                    this.bgcolor = value;
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("Color"));
+                }
+            }
+        }
+
     }
 
     // Cell Class inherited from SpreadSheet to be instantiated in Spreadsheet
@@ -124,6 +142,12 @@ namespace Spreadsheet_Engine
         {
             this.tree.SubscribeToCell(cell);
         }
+
+        public void UnSubscribeTreeToCell(Cell cell)
+        {
+            //this.tree.UnSubscribeToCell(cell);
+        }
+
 
         public void NewExpression(string exp)
         {

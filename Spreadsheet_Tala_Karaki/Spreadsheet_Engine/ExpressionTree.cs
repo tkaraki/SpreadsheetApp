@@ -246,6 +246,15 @@ namespace Spreadsheet_Engine
         }
 
         /// <summary>
+        /// Unsubscribes the expression tree from the property changed event of a cell in case of undo.
+        /// </summary>
+        public void UnSubscribeToCell(Cell cell)
+        {
+            cell.PropertyChanged -= this.CellChanged;
+        }
+
+
+        /// <summary>
         /// Updates all other cells that depend on a cell that has changed.
         /// </summary>
         private void CellChanged(object sender, EventArgs e)
