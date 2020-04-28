@@ -216,5 +216,15 @@ namespace Spreadsheet_Tala_Karaki
         {
             this.spreadSheet1.Redo();
         }
+
+        private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void loadToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
