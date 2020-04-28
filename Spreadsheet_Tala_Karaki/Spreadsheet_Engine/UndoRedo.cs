@@ -9,10 +9,13 @@ namespace Spreadsheet_Engine
     public abstract class UndoRedoChange
     {
         public string ButtonMessage;
+        public abstract void Execute();
+        public abstract void UnExecute();
     }
 
     public class TextChange : UndoRedoChange
     {
+        public string ButtonMessage = " Text Change ";
         private string oldText;
         private string newText;
         private Cell cell;
@@ -24,12 +27,12 @@ namespace Spreadsheet_Engine
             this.newText = newText;
         }
         
-        public void Do()
+        public override void Execute()
         {
             this.cell.Text = this.newText;
         }
         
-        public void Undo()
+        public override void UnExecute()
         {
             this.cell.Text = this.oldText;
         }
@@ -37,6 +40,8 @@ namespace Spreadsheet_Engine
 
     public class ColorChange : UndoRedoChange
     {
+
+        public string ButtonMessage = " Color Change ";
         private uint newColor;
         private List<uint> oldColor;
         private List<Cell> cells;
@@ -48,7 +53,7 @@ namespace Spreadsheet_Engine
             this.cells = cells;
         }
 
-        public void Do()
+        public override void Execute()
         {
             foreach (Cell cell in this.cells)
             {
@@ -56,7 +61,7 @@ namespace Spreadsheet_Engine
             }
         }
 
-        public void Undo()
+        public override void UnExecute()
         {
             for (int i = 0; i < this.cells.Count; i++)
             {

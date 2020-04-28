@@ -18,6 +18,8 @@ namespace Spreadsheet_Engine
         private readonly int rowCount = 0;
         private readonly int columnCount = 0;
 
+        private Stack<UndoRedoChange> Undos = new Stack<UndoRedoChange>();
+        private Stack<UndoRedoChange> Redos = new Stack<UndoRedoChange>();
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         /// <summary>
@@ -37,7 +39,7 @@ namespace Spreadsheet_Engine
                 for (int j = 0; j < colC; j++)
                 {
                     this.cellArray[i, j] = new Cell(i, j, string.Empty);
-                    this.cellArray[i, j].PropertyChanged += this.OnPropertyChanged;
+                    this.cellArray[i, j].PropertyChanged += this.CellPropertyChanged;
                 }
             }
 
@@ -72,20 +74,38 @@ namespace Spreadsheet_Engine
             }
         }
         
-        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        public void CellPropertyChanged(object sender, EventArgs e)
         {
             Cell cell = sender as Cell;
-            if (cell.Text[0] != '=')
+            PropertyChangedEventArgs E = e as PropertyChangedEventArgs;
+            
+            if (E.PropertyName == "Value")
+            {
+                this.PropertyChanged(this, new PropertyChangedEventArgs(cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString() + "," + cell.Value));
+                return;
+            }
+
+            if (E.PropertyName == "Color")
+            {
+                this.PropertyChanged("Color", new PropertyChangedEventArgs(cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString() + "," + cell.BGColor));
+                return;
+            }
+
+            if (cell.Text.Length == 0 || cell.Text[0] != '=')
             {
                 cell.Value = cell.Text;
                 this.PropertyChanged(cell, new PropertyChangedEventArgs("Text"));
 
-            }
+                if (cell.varNames.Count > 0)
+                {
+                    foreach (KeyValuePair<string, double> indexName in cell.varNames.ToList())
+                    {
+                        cell.UnSubscribeTreeToCell(this.GetCellFromString(indexName.Key));
+                    }
+                }
 
-           else if (e.PropertyName == "Value")
-            {
-                this.PropertyChanged(this, new PropertyChangedEventArgs(cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString() + "," + cell.Value));
-                return;
+                this.PropertyChanged(cell, new PropertyChangedEventArgs("Text"));
+
             }
 
             else
@@ -128,6 +148,54 @@ namespace Spreadsheet_Engine
             else
             {
                 return this.cellArray[rowIndex, columnIndex];
+            }
+        }
+        
+        /// <summary>
+        /// Push a new change to the undo stack everytime a cell property changes.
+        /// </summary>
+        /// <param name="change"> UndoRedo Change.</param>
+        public void AddUndo(UndoRedoChange change)
+        {
+            this.Undos.Push(change);
+            this.PropertyChanged(change, new PropertyChangedEventArgs("Undo"));
+        }
+        
+        /// <summary>
+        /// Perform an undo change in the spreadsheet.
+        /// </summary>
+        public void Undo()
+        {
+            this.Undos.Peek().UnExecute();
+            this.Redos.Push(this.Undos.Pop());
+            this.PropertyChanged(this.Redos.Peek(), new PropertyChangedEventArgs("Redo"));
+
+            if (this.Undos.Count > 0)
+            {
+                this.PropertyChanged(this.Redos.Peek(), new PropertyChangedEventArgs("Undo"));
+            }
+            else
+            {
+                this.PropertyChanged(this.Redos.Peek(), new PropertyChangedEventArgs("!Undo"));
+            }
+        }
+
+        /// <summary>
+        /// Perform a redo change in the spreadsheet.
+        /// </summary>
+        public void Redo()
+        {
+            this.Redos.Peek().Execute();
+            this.Undos.Push(this.Redos.Pop());
+            this.PropertyChanged(this.Undos.Peek(), new PropertyChangedEventArgs("Undo"));
+
+            if (this.Redos.Count > 0)
+            {
+                this.PropertyChanged(this.Undos.Peek(), new PropertyChangedEventArgs("Redo"));
+            }
+            else
+            {
+                this.PropertyChanged(this.Undos.Peek(), new PropertyChangedEventArgs("!Redo"));
             }
         }
 

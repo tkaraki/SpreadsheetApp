@@ -11,8 +11,8 @@ namespace Spreadsheet_Engine
 
     public abstract class SpreadsheetCell : INotifyPropertyChanged
     {
-        protected string text = string.Empty;
-        protected string value = string.Empty;
+        protected string text;
+        protected string value;
         private readonly int rowIndex = 0;
         private readonly int columnIndex = 0;
         protected uint bgcolor = 0xFFFFFFFF;
@@ -33,8 +33,8 @@ namespace Spreadsheet_Engine
         {
             this.rowIndex = rIndex;
             this.columnIndex = cIndex;
-            this.text = text;
-            this.value = text;
+            this.text = string.Empty;
+            this.value = string.Empty;
 
             // Set up dictionary with cell indexes to find cells faster.
             int k = 0;
@@ -145,7 +145,7 @@ namespace Spreadsheet_Engine
 
         public void UnSubscribeTreeToCell(Cell cell)
         {
-            //this.tree.UnSubscribeToCell(cell);
+            this.tree.UnSubscribeToCell(cell);
         }
 
 

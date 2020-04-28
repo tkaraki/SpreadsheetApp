@@ -6,6 +6,7 @@
 namespace Spreadsheet_Tala_Karaki
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Drawing;
     using System.Windows.Forms;
@@ -29,10 +30,12 @@ namespace Spreadsheet_Tala_Karaki
         private void Form1_Load(object sender, EventArgs e)
         {
             this.spreadSheet1 = new SpreadsheetEngine(50, 26);
-            this.spreadSheet1.PropertyChanged += this.CellPropertyChanged;
             this.InitializeGrid();
+            this.spreadSheet1.PropertyChanged += this.CellPropertyChanged;
             this.dataGridView1.CellBeginEdit += new DataGridViewCellCancelEventHandler(this.CellBeginEdit);
             this.dataGridView1.CellEndEdit += new DataGridViewCellEventHandler(this.CellEndEdit);
+            this.undoToolStripMenuItem.Enabled = false;
+            this.redoToolStripMenuItem.Enabled = false;
         }
 
         /// <summary>
@@ -65,9 +68,39 @@ namespace Spreadsheet_Tala_Karaki
         {
             if (sender.GetType() == typeof(SpreadsheetEngine))
             {
-                string temp = e.PropertyName; 
+                string temp = e.PropertyName;
                 string[] values = temp.Split(','); 
                 this.dataGridView1.Rows[Convert.ToInt32(values[0])].Cells[Convert.ToInt32(values[1])].Value = values[2];
+            }
+            else if (sender == "Color")
+            {
+                string temp = e.PropertyName;
+                string[] values = temp.Split(',');
+                if (uint.TryParse(values[2], out uint result))
+                {
+                    this.dataGridView1.Rows[Convert.ToInt32(values[0])].Cells[Convert.ToInt32(values[1])].Style.BackColor = Color.FromArgb(unchecked((int)result));
+                }
+            }
+            else if (sender is UndoRedoChange)
+            {
+                string temp = e.PropertyName;
+
+                if (temp == "!Undo")
+                {
+                    this.undoToolStripMenuItem.Enabled = false;
+                }
+                else if (temp == "Undo")
+                {
+                    this.undoToolStripMenuItem.Enabled = true;
+                }
+                else if (temp == "!Redo")
+                {
+                    this.redoToolStripMenuItem.Enabled = false;
+                }
+                else if (temp == "Redo")
+                {
+                    this.redoToolStripMenuItem.Enabled = true;
+                }
             }
         }
 
@@ -115,47 +148,73 @@ namespace Spreadsheet_Tala_Karaki
 
         private void CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-           DataGridView grid = (DataGridView)sender;
-           SpreadsheetCell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
-           if (grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value != null)
+            string val = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Value;
+
+            if (val.Length > 0)
             {
-                cell.Text = grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+                this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = val;
             }
-            else
+        }
+
+        private void CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex != -1)
             {
-                cell.Text = string.Empty;
-            }
+                if (this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value == null)
+                {
+                    Cell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
+                    TextChange command = new TextChange(cell, cell.Text, String.Empty);
+                    this.spreadSheet1.AddUndo(command);
+                    this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Text = String.Empty;
+                }
 
-           grid.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = cell.Value;
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-        }
-
-        private void dataGridView1_CellContentClick_1(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void OnCellPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            SpreadsheetCell oldCell = (SpreadsheetCell)sender;
-            if (e.PropertyName == "Value")
-            {
-             this.dataGridView1.Rows[oldCell.RowIndex].Cells[oldCell.ColumnIndex].Value = oldCell.Value;
+                else if (this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Value != this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString())
+                {
+                    Cell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
+                    TextChange command = new TextChange(cell, cell.Text, this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString());
+                    this.spreadSheet1.AddUndo(command);
+                    this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Text = this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
+                }
             }
         }
 
         private void changeBackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            ColorDialog CDialogue = new ColorDialog();
-            Color selected = Color.White;
-
-            if (CDialogue.ShowDialog() == DialogResult.OK)
+            List<Cell> cells = new List<Cell>();
+            List<uint> oldColors = new List<uint>();
+            ColorDialog myDialog = new ColorDialog();
+            
+            myDialog.AllowFullOpen = true;
+            myDialog.ShowHelp = true;
+            
+            if (myDialog.ShowDialog() == DialogResult.OK)
             {
-                selected = CDialogue.Color;
+                foreach (DataGridViewTextBoxCell cell in this.dataGridView1.SelectedCells)
+                {
+                    cells.Add(this.spreadSheet1.GetCell(cell.RowIndex, cell.ColumnIndex));
+                    oldColors.Add(this.spreadSheet1.GetCell(cell.RowIndex, cell.ColumnIndex).BGColor);
+                    this.spreadSheet1.GetCell(cell.RowIndex, cell.ColumnIndex).BGColor = this.ColorToUInt(myDialog.Color);
+                }
+
+                ColorChange command = new ColorChange(cells, oldColors, this.ColorToUInt(myDialog.Color));
+                this.spreadSheet1.AddUndo(command);
             }
+        }
+
+        private uint ColorToUInt(Color color)
+        {
+            return (uint)((color.A << 24) | (color.R << 16) |
+                          (color.G << 8) | (color.B << 0));
+        }
+
+        private void undoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.spreadSheet1.Undo();
+        }
+
+        private void redoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.spreadSheet1.Redo();
         }
     }
 }
