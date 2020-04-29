@@ -94,7 +94,33 @@ namespace SpreadsheetTests
             
         }
 
-        
+        [Test]
+        public void TestReferences()
+        {
+            A1.Text = "10";
+            Assert.AreEqual(A1.Text, A1.Value);
+
+            //test self reference
+            D1.Text = "=D1";
+            Assert.AreEqual(D1.Value, "!(self reference)");
+
+            //test cell dependency
+            C1.Text = "=D1";
+            Assert.AreEqual(D1.Value, C1.Value);
+
+            //test circular reference
+            D1.Text = "=C1";
+            Assert.AreEqual("!(circular reference)", C1.Value);
+
+            // test bad reference
+            B1.Text = "=C1+Hello";
+            Assert.AreEqual("!(bad reference)", B1.Value);
+
+
+        }
+
+
+
 
     }
 }
