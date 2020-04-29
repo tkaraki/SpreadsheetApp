@@ -79,7 +79,11 @@ namespace SpreadsheetTests
             spreadsheet.Undo();
             Assert.AreEqual(String.Empty, A1.Value);
 
-           
+            spreadsheet.Redo();
+            Assert.AreEqual("10", A1.Value);
+
+            spreadsheet.Redo();
+            Assert.AreEqual("16", B1.Value);
 
         }
         
