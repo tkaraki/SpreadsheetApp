@@ -163,16 +163,16 @@ namespace Spreadsheet_Tala_Karaki
                 if (this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value == null)
                 {
                     Cell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
-                    TextChange command = new TextChange(cell, cell.Text, String.Empty);
-                    this.spreadSheet1.AddUndo(command);
+                    TextChange change = new TextChange(cell, cell.Text, String.Empty);
+                    this.spreadSheet1.AddUndo(change);
                     this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Text = String.Empty;
                 }
 
                 else if (this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Value != this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString())
                 {
                     Cell cell = this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex);
-                    TextChange command = new TextChange(cell, cell.Text, this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString());
-                    this.spreadSheet1.AddUndo(command);
+                    TextChange change = new TextChange(cell, cell.Text, this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString());
+                    this.spreadSheet1.AddUndo(change);
                     this.spreadSheet1.GetCell(e.RowIndex, e.ColumnIndex).Text = this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString();
                 }
             }
@@ -196,8 +196,8 @@ namespace Spreadsheet_Tala_Karaki
                     this.spreadSheet1.GetCell(cell.RowIndex, cell.ColumnIndex).BGColor = this.ColorToUInt(myDialog.Color);
                 }
 
-                ColorChange command = new ColorChange(cells, oldColors, this.ColorToUInt(myDialog.Color));
-                this.spreadSheet1.AddUndo(command);
+                ColorChange change = new ColorChange(cells, oldColors, this.ColorToUInt(myDialog.Color));
+                this.spreadSheet1.AddUndo(change);
             }
         }
 

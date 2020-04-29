@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Spreadsheet_Engine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -61,38 +62,27 @@ namespace SpreadsheetTests
         public void TestUndoRedo()
         {
             A1.Text = "10";
-            Assert.AreEqual(A1.Text, A1.Value);
-            
+            Assert.AreEqual(A1.Value, "10");
+            TextChange change1 = new TextChange(A1, String.Empty, A1.Text);
+
             B1.Text = "=10+6";
             Assert.AreEqual(B1.Value, "16");
-            
-            C1.Text = "=B1";
-            Assert.AreEqual(B1.Value, C1.Value);
-            //spreadsheet.Undo();
-            //Assert.AreEqual("0", C1.Value);
-            //Assert.AreEqual(B1.Value, "16");
+            TextChange change2 = new TextChange(B1, String.Empty, B1.Value);
+           
+            spreadsheet.AddUndo(change1);
+            spreadsheet.AddUndo(change2);
 
-            //spreadsheet.Undo();
-            //Assert.AreEqual(B1.Value, "0");
+            //test undo text change
+            spreadsheet.Undo();
+            Assert.AreEqual(String.Empty, B1.Value);
 
-            //spreadsheet.Redo();
-            //Assert.AreEqual(B1.Value, "16");
+            spreadsheet.Undo();
+            Assert.AreEqual(String.Empty, A1.Value);
 
-            //spreadsheet.Redo();
-            //Assert.AreEqual(C1.Value, "16");
-
+           
 
         }
-
-
-        [Test]
-        public void TestSaveLoad()
-        {
-            //string saveText = "<spreadsheet> <cell name=“B1”> <bgcolor>FF8000FF</bgcolor> <text>=A1+6</text> </cell> </spreadsheet>";
-            //spreadsheet.Save();
-            //Assert.AreEqual(saveText, savefunction);
-            
-        }
+        
 
         [Test]
         public void TestReferences()
@@ -103,17 +93,14 @@ namespace SpreadsheetTests
             //test self reference
             D1.Text = "=D1";
             Assert.AreEqual(D1.Value, "!(self reference)");
-
-            //test cell dependency
-            C1.Text = "=D1";
-            Assert.AreEqual(D1.Value, C1.Value);
-
+            
             //test circular reference
+            C1.Text = "=D1";
             D1.Text = "=C1";
             Assert.AreEqual("!(circular reference)", C1.Value);
 
             // test bad reference
-            B1.Text = "=C1+Hello";
+            B1.Text = "=6+Hello";
             Assert.AreEqual("!(bad reference)", B1.Value);
 
 

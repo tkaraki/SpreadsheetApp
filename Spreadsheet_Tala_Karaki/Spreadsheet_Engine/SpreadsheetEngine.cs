@@ -121,14 +121,18 @@ namespace Spreadsheet_Engine
                 }
 
                 cell.NewExpression(cell.Text.Substring(1));
-                
-                foreach (KeyValuePair<string, double> index in cell.varNames.ToList())
-                {
-                    cell.SubscribeTreeToCell(this.GetCellFromString(index.Key));
-                }
 
-                cell.Value = cell.ComputeExpression();
-                this.PropertyChanged(this, new PropertyChangedEventArgs(cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString() + "," + cell.Value));
+                if (this.IsValidReference(cell))
+                {
+                    foreach (KeyValuePair<string, double> index in cell.varNames.ToList())
+                    {
+                    cell.SubscribeTreeToCell(this.GetCellFromString(index.Key));
+                    }
+
+                    cell.Value = cell.ComputeExpression();
+                    this.PropertyChanged(this, new PropertyChangedEventArgs(cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString() + "," + cell.Value));
+
+                }
             }
         }
 
@@ -160,6 +164,92 @@ namespace Spreadsheet_Engine
             {
                 return this.cellArray[rowIndex, columnIndex];
             }
+        }
+
+        /// <summary>
+        /// Returns True if input is a valid reference.
+        /// Returns False if there is an invalid reference.
+        /// </summary>
+        /// <param name="cell"> Spreadsheet Cell.</param>
+        private bool IsValidReference(Cell cell)
+        {
+            // check each cell stored in the cell's variable dictionary.
+            foreach (KeyValuePair<string, double> indexName in cell.varNames.ToList())
+            {
+                // if this cell's dictionary contains a cell with the same index then it is a self reference
+                if (indexName.Key == cell.IndexName)
+                {
+                    cell.Value = "!(self reference)";
+                    return false;
+                }
+
+                // if this cell's indexes dont pass the isCell function then it is not a reference
+                else if (!this.IsCell(indexName.Key))
+                {
+                    cell.Value = "!(bad reference)";
+                    return false;
+                }
+
+                // if this cell's dictionary contains a cell with a dictionary that references it, then it is a circular reference.
+                else if (this.IsCircularReference(cell.IndexName, indexName.Key))
+                {
+                    cell.Value = "!(circular reference)";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns True if input is a cell.
+        /// Returns False if there is not a cell.
+        /// </summary>
+        /// <param name="index"> Cell index.</param>
+        private bool IsCell(string index)
+        {
+            int rowIndex, columnIndex;
+            int.TryParse(index.Substring(1), out rowIndex);
+            columnIndex = Convert.ToInt32(index[0]) - 65;
+
+            if (rowIndex > this.rowCount || rowIndex < 0 ||
+                columnIndex > this.columnCount || columnIndex < 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns True if cell has no circular reference.
+        /// Returns False if there is a circular reference.
+        /// </summary>
+        /// <param name="parentCell"> Cell being checked.</param>
+        /// <param name="dictCell"> Cell in parent cell's variable dict .</param>
+        private bool IsCircularReference(string parentCell, string dictCell)
+        {
+            Cell cell = this.GetCellFromString(dictCell);
+
+            // check each cell stored in the cell's variable dictionary.
+            foreach (KeyValuePair<string, double> indexName in cell.varNames.ToList())
+            {
+                // if cell is subscribed to its parent then it is a circular reference.
+                if (indexName.Key == parentCell)
+                {
+                    return true;
+                }
+
+                // if cell is referencing a cell with a bad reference then it is a circular reference.
+                if (this.GetCellFromString(indexName.Key).Value == "!(self reference)")
+                {
+                    return true;
+                }
+
+                return this.IsCircularReference(indexName.Key, parentCell);
+            }
+
+            return false;
         }
 
         /// <summary>
