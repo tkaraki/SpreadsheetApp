@@ -240,12 +240,9 @@ namespace Spreadsheet_Tala_Karaki
 
             if (openFileDialog1.FileName != string.Empty)
             {
-                System.IO.FileStream fs =
-                    (System.IO.FileStream)openFileDialog1.OpenFile();
-
+                System.IO.FileStream fs = (System.IO.FileStream)openFileDialog1.OpenFile();
                 this.ClearSheet();
                 this.spreadSheet1.Load(fs);
-
                 fs.Close();
             }
 

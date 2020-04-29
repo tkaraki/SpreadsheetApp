@@ -88,8 +88,8 @@ namespace SpreadsheetTests
         [Test]
         public void TestSaveLoad()
         {
-            //saveText = "<spreadsheet> <cell name=“B1”> <bgcolor>FF8000FF</bgcolor> <text>=A1+6</text> </cell> </spreadsheet>";
-            //savefunction = spreadsheet.save();
+            //string saveText = "<spreadsheet> <cell name=“B1”> <bgcolor>FF8000FF</bgcolor> <text>=A1+6</text> </cell> </spreadsheet>";
+            //spreadsheet.Save();
             //Assert.AreEqual(saveText, savefunction);
             
         }
