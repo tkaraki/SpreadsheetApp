@@ -219,12 +219,26 @@ namespace Spreadsheet_Tala_Karaki
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            SaveFileDialog saveFileDialog1 = new SaveFileDialog();
+            saveFileDialog1.Filter = "XML File|*.xml";
+            saveFileDialog1.ShowDialog();
+
+            if (saveFileDialog1.FileName != string.Empty)
+            {
+                System.IO.FileStream fs = (System.IO.FileStream)saveFileDialog1.OpenFile();
+                this.spreadSheet1.Save(fs);
+                fs.Close();
+            }
 
         }
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            
 
         }
+
+        
+
     }
 }

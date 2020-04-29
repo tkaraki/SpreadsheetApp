@@ -9,7 +9,9 @@ namespace Spreadsheet_Engine
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.IO;
     using System.Linq;
+    using System.Xml;
 
     public class SpreadsheetEngine
     {
@@ -73,12 +75,12 @@ namespace Spreadsheet_Engine
                 return this.columnCount;
             }
         }
-        
+
         public void CellPropertyChanged(object sender, EventArgs e)
         {
             Cell cell = sender as Cell;
             PropertyChangedEventArgs E = e as PropertyChangedEventArgs;
-            
+
             if (E.PropertyName == "Value")
             {
                 this.PropertyChanged(this, new PropertyChangedEventArgs(cell.RowIndex.ToString() + "," + cell.ColumnIndex.ToString() + "," + cell.Value));
@@ -98,9 +100,9 @@ namespace Spreadsheet_Engine
 
                 if (cell.varNames.Count > 0)
                 {
-                    foreach (KeyValuePair<string, double> indexName in cell.varNames.ToList())
+                    foreach (KeyValuePair<string, double> index in cell.varNames.ToList())
                     {
-                        cell.UnSubscribeTreeToCell(this.GetCellFromString(indexName.Key));
+                        cell.UnSubscribeTreeToCell(this.GetCellFromString(index.Key));
                     }
                 }
 
@@ -110,7 +112,16 @@ namespace Spreadsheet_Engine
 
             else
             {
+                if (cell.varNames.Count > 0)
+                {
+                    foreach (KeyValuePair<string, double> index in cell.varNames.ToList())
+                    {
+                        cell.UnSubscribeTreeToCell(this.GetCellFromString(index.Key));
+                    }
+                }
+
                 cell.NewExpression(cell.Text.Substring(1));
+                
                 foreach (KeyValuePair<string, double> index in cell.varNames.ToList())
                 {
                     cell.SubscribeTreeToCell(this.GetCellFromString(index.Key));
@@ -150,7 +161,7 @@ namespace Spreadsheet_Engine
                 return this.cellArray[rowIndex, columnIndex];
             }
         }
-        
+
         /// <summary>
         /// Push a new change to the undo stack everytime a cell property changes.
         /// </summary>
@@ -160,7 +171,7 @@ namespace Spreadsheet_Engine
             this.Undos.Push(change);
             this.PropertyChanged(change, new PropertyChangedEventArgs("Undo"));
         }
-        
+
         /// <summary>
         /// Perform an undo change in the spreadsheet.
         /// </summary>
@@ -197,6 +208,49 @@ namespace Spreadsheet_Engine
             {
                 this.PropertyChanged(this.Undos.Peek(), new PropertyChangedEventArgs("!Redo"));
             }
+        }
+
+        /// <summary>
+        /// Save the spreasheet to file.
+        /// </summary>
+        public void Save(Stream stream)
+        {
+            XmlWriter writer = XmlWriter.Create(stream);
+            writer.WriteStartDocument();
+            writer.WriteStartElement("spreadsheet");
+            
+            for (int i = 0; i < this.RowCount; i++)
+            {
+                for (int j = 0; j < this.ColumnCount; j++)
+                {
+                    Cell cell = this.GetCell(i, j);
+                    if (cell.Text != string.Empty || cell.BGColor != 0xFFFFFFFF)
+                    {
+                        writer.WriteStartElement("cell");
+                        writer.WriteStartElement("name");
+                        writer.WriteString(cell.IndexName);
+                        writer.WriteEndElement();
+                        writer.WriteStartElement("bgcolor");
+                        writer.WriteString(cell.BGColor.ToString());
+                        writer.WriteEndElement();
+                        writer.WriteStartElement("text");
+                        writer.WriteString(cell.Text);
+                        writer.WriteEndElement();
+                        writer.WriteEndElement();
+                    }
+                }
+            }
+            writer.WriteEndElement();
+            writer.WriteEndDocument();
+            writer.Close();
+        }
+        
+        /// <summary>
+        /// Load the spreasheet from file.
+        /// </summary>
+        public void Load(Stream stream)
+        {
+           
         }
 
     }
