@@ -215,10 +215,16 @@ namespace Spreadsheet_Engine
         /// </summary>
         public void Save(Stream stream)
         {
-            XmlWriter writer = XmlWriter.Create(stream);
+            var writerSettings = new XmlWriterSettings()
+            {
+                Indent = true,
+                IndentChars = "    "
+            };
+
+            XmlWriter writer = XmlWriter.Create(stream, writerSettings);
             writer.WriteStartDocument();
             writer.WriteStartElement("spreadsheet");
-            
+
             for (int i = 0; i < this.RowCount; i++)
             {
                 for (int j = 0; j < this.ColumnCount; j++)
@@ -240,6 +246,7 @@ namespace Spreadsheet_Engine
                     }
                 }
             }
+
             writer.WriteEndElement();
             writer.WriteEndDocument();
             writer.Close();
@@ -250,10 +257,43 @@ namespace Spreadsheet_Engine
         /// </summary>
         public void Load(Stream stream)
         {
-           
+            var readerSettings = new XmlReaderSettings()
+            {
+                IgnoreWhitespace = true,
+            };
+
+            XmlReader reader = XmlReader.Create(stream, readerSettings);
+
+            string temp;
+            Cell cell;
+
+            reader.ReadStartElement("spreadsheet");
+
+            while (reader.Name == "cell")
+            {
+                reader.ReadStartElement("cell");
+                reader.ReadStartElement("name");
+                temp = reader.ReadContentAsString();
+                cell = this.GetCellFromString(temp);
+                reader.ReadEndElement();
+                reader.ReadStartElement("bgcolor");
+                temp = reader.ReadContentAsString();
+                uint.TryParse(temp, out uint result);
+                cell.BGColor = result;
+                reader.ReadEndElement();
+                reader.ReadStartElement("text");
+                temp = reader.ReadContentAsString();
+                cell.Text = temp;
+                reader.ReadEndElement();
+                reader.ReadEndElement();
+            }
+
+            reader.ReadEndElement();
         }
 
     }
+
 }
+
 
 

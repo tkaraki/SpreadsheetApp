@@ -234,11 +234,33 @@ namespace Spreadsheet_Tala_Karaki
 
         private void loadToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "XML File|*.xml";
+            openFileDialog1.ShowDialog();
+
+            if (openFileDialog1.FileName != string.Empty)
+            {
+                System.IO.FileStream fs =
+                    (System.IO.FileStream)openFileDialog1.OpenFile();
+
+                this.ClearSheet();
+                this.spreadSheet1.Load(fs);
+
+                fs.Close();
+            }
 
         }
 
-        
+        private void ClearSheet()
+        {
+            this.dataGridView1.Rows.Clear();
+            this.dataGridView1.Columns.Clear();
+            this.dataGridView1.Refresh();
+            this.Form1_Load(this, new EventArgs());
+        }
+
+
+
 
     }
 }
